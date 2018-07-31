@@ -4,7 +4,7 @@ from threading import Timer
 
 class IQEnvoy():
     def __init__(self, **kwargs):
-        self.ip_address = kwargs['ip_address']
+        self.host = kwargs.get('host','envoy.local')
         self.home_data = None
         self.production_data = None
         self.inventory_data = None
@@ -26,7 +26,7 @@ class IQEnvoy():
         return self.json_request('inventory')
 
     def json_request(self, file):
-        return requests.get('http://'+self.ip_address+'/'+file+'.json').json()
+        return requests.get('http://'+self.host+'/'+file+'.json').json()
 
     @property
     def inverter_production(self):

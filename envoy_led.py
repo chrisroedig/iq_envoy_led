@@ -27,7 +27,7 @@ class IQEnvoyLed():
             LED_BRIGHTNESS,
             LED_CHANNEL,
             LED_STRIP)
-        self.iq_envoy = envoy.IQEnvoy(ip_address = '192.168.1.68')
+        self.iq_envoy = envoy.IQEnvoy(host = 'envoy.local')
         self.production_meter = production_meter.ProductionMeter(
             iq_envoy = self.iq_envoy,
             pixel_count = LED_COUNT,
