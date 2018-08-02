@@ -31,12 +31,12 @@ class IQEnvoy():
     def inverter_production(self):
         if self.production_data is None:
             return None
-        return next(p for p in self.production_data['production'] if p['measurementType'] == 'production')
+        return next(p for p in self.production_data['production'] if p.get('measurementType') == 'production')
     @property
     def total_consumption(self):
         if self.production_data is None:
             return None
-        return next(p for p in self.production_data['consumption'] if p['measurementType'] == 'total-consumption')
+        return next(p for p in self.production_data['consumption'] if p.get('measurementType') == 'total-consumption')
     @property
     def consumption_power(self):
         if self.total_consumption is None:
