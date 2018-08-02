@@ -1,7 +1,6 @@
 import requests
 from threading import Timer
 
-
 class IQEnvoy():
     def __init__(self, **kwargs):
         self.host = kwargs.get('host','envoy.local')
@@ -32,8 +31,17 @@ class IQEnvoy():
     def inverter_production(self):
         if self.production_data is None:
             return None
-        return next(p for p in self.production_data['production'] if p['type'] == 'inverters')
-
+        return next(p for p in self.production_data['production'] if p['measurementType'] == 'production')
+    @property
+    def total_consumption(self):
+        if self.production_data is None:
+            return None
+        return next(p for p in self.production_data['consumption'] if p['measurementType'] == 'total-consumption')
+    @property
+    def consumption_power(self):
+        if self.total_consumption is None:
+            return 0.0
+        return abs(self.total_consumption['wNow'])
     @property
     def inverter_power(self):
         if self.inverter_production is None:

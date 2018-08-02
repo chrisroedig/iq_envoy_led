@@ -1,6 +1,7 @@
 import threading
 import envoy
 import production_meter
+import consumption_meter
 import signal
 import sys
 import time
@@ -18,16 +19,16 @@ LED_CHANNEL    = 0       # set to '1' for GPIOs 13, 19, 41, 45 or 53
 class IQEnvoyLed():
     def __init__(self):
         self.strip = Adafruit_NeoPixel(
-                LED_COUNT, 
-                LED_PIN, 
-                LED_FREQ_HZ, 
-                LED_DMA, 
+                LED_COUNT,
+                LED_PIN,
+                LED_FREQ_HZ,
+                LED_DMA,
                 LED_INVERT,
-                LED_BRIGHTNESS, 
+                LED_BRIGHTNESS,
                 LED_CHANNEL)
         self.strip.begin()
         self.iq_envoy = envoy.IQEnvoy(host = 'envoy.local')
-        self.production_meter = production_meter.ProductionMeter(
+        self.production_meter = production_meter.ConsumptionMeter(
             iq_envoy = self.iq_envoy,
             pixel_count = LED_COUNT,
             max_power = 5000
