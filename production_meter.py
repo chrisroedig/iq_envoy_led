@@ -4,8 +4,8 @@ import random
 class ProductionMeter():
     def __init__(self, iq_envoy=None, pixel_count=32, max_power=5000):
         self.iq_envoy = iq_envoy
-        self.active_color = [20, 115,50]
-        self.idle_color = [0, 0,50]
+        self.active_color = (20, 115,50)
+        self.idle_color = (0, 0,50)
         self.pixel_count = pixel_count
         self.max_power = max_power
         self.pos_factor = float(self.pixel_count) / float(self.max_power)
