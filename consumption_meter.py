@@ -38,6 +38,12 @@ class ConsumptionMeter():
             return float(self.pixel_count) / float(self.max_power_lo)
         else:
             return float(self.pixel_count) / float(self.max_power_hi)
+    @property
+    def mod_speed(self):
+        if self.get_power() < self.max_power_lo:
+            return 1.0
+        else:
+            return 5.0
 
     def get_iq_envoy_consumption_power(self):
         return self.iq_envoy.consumption_power
@@ -52,7 +58,7 @@ class ConsumptionMeter():
                 int(self.active_color[2] * self.wave_amp(i)))
     def wave_amp(self, pos):
         t = float(time.time())
-        amp = math.sin(-t*5.0+pos)
+        amp = math.sin(-t*self.mod_speed+pos)
         return 1.0 -.3 - amp*0.3
 
 
