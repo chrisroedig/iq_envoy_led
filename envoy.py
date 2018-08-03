@@ -24,8 +24,9 @@ class IQEnvoy():
     def get_inventory_data(self):
         return self.json_request('inventory')
 
-    def json_request(self, file):
-        return requests.get('http://'+self.host+'/'+file+'.json').json()
+    def json_request(self, f):
+        resp =  requests.get('http://'+self.host+'/'+f+'.json')
+        return resp.json()
 
     @property
     def inverter_production(self):
@@ -57,10 +58,8 @@ class IQEnvoy():
     def poll_for_data(self):
         if self.polling_active != True:
             return
-        print 'getting data...'
         self.get_data()
-        print 'wattage: '+str(self.inverter_power)
-        self.poll_timer = Timer(10.0, self.poll_for_data).start()
+        self.poll_timer = Timer(2.0, self.poll_for_data).start()
 
     def stop_polling(self):
         self.polling_active = False

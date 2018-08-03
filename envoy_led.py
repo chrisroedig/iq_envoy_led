@@ -11,7 +11,7 @@ LED_COUNT      = 32      # Number of LED pixels.
 LED_PIN        = 18      # GPIO pin connected to the pixels (18 uses PWM!).
 LED_FREQ_HZ    = 800000  # LED signal frequency in hertz (usually 800khz)
 LED_DMA        = 10       # DMA channel to use for generating signal (try 5)
-LED_BRIGHTNESS = 255     # Set to 0 for darkest and 255 for brightest
+LED_BRIGHTNESS = 127     # Set to 0 for darkest and 255 for brightest
 
 LED_INVERT     = False   # True to invert the signal (when using NPN transistor level shift)
 LED_CHANNEL    = 0       # set to '1' for GPIOs 13, 19, 41, 45 or 53
@@ -27,11 +27,11 @@ class IQEnvoyLed():
                 LED_BRIGHTNESS,
                 LED_CHANNEL)
         self.strip.begin()
-        self.iq_envoy = envoy.IQEnvoy(host = 'envoy.local')
+        self.iq_envoy = envoy.IQEnvoy()
         self.consumption_meter = consumption_meter.ConsumptionMeter(
             iq_envoy = self.iq_envoy,
             pixel_count = LED_COUNT,
-            max_power = 5000
+            max_power = 8000
         )
         self.run = False
     def start(self):
@@ -45,7 +45,7 @@ class IQEnvoyLed():
         if self.run is not True:
             return
         self.set_pixels()
-        threading.Timer(1.00, self.set_pixels_loop).start()
+        threading.Timer(.05, self.set_pixels_loop).start()
     def set_pixels(self):
         for i, rgb in enumerate( self.consumption_meter.pixels ):
             self.strip.setPixelColor(i, Color(rgb[0],rgb[1], rgb[2]))
