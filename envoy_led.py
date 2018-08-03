@@ -30,8 +30,7 @@ class IQEnvoyLed():
         self.iq_envoy = envoy.IQEnvoy()
         self.consumption_meter = consumption_meter.ConsumptionMeter(
             iq_envoy = self.iq_envoy,
-            pixel_count = LED_COUNT,
-            max_power = 8000
+            pixel_count = LED_COUNT
         )
         self.run = False
     def start(self):
