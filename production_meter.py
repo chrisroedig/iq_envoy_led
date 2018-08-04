@@ -6,8 +6,8 @@ class ProductionMeter():
     def __init__(self, iq_envoy=None, pixel_count=32, max_power = 4000):
         self.iq_envoy = iq_envoy
         self.pixel_count = pixel_count
-        self.idle_color = (0, 15, 5)
-        self.active_color = (0, 150, 50)
+        self.idle_color = (0, 2, 5)
+        self.active_color = (0, 60, 20)
         self.max_power = max_power
         self.pos_factor = float(self.pixel_count) / float(self.max_power)
         self.mod_speed = 5.0
@@ -25,8 +25,8 @@ class ProductionMeter():
         pixel = int( self.pos_factor * self.get_power() )
         return min(self.pixel_count-1, pixel)
 
-    def get_iq_envoy_consumption_power(self):
-        return self.iq_envoy.production_power
+    def get_iq_envoy_inverter_power(self):
+        return self.iq_envoy.inverter_power
 
     def get_power(self):
         return random.random()*500+1000
