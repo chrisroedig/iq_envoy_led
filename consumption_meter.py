@@ -60,13 +60,13 @@ class ConsumptionMeter():
 
     def modulated_color(self, i):
         return (
-                int(self.active_color[0] * self.wave_amp(i)),
-                int(self.active_color[1] * self.wave_amp(i)),
-                int(self.active_color[2] * self.wave_amp(i)))
-    def wave_amp(self, pos):
+                int(self.active_color[0] * self.color_amp(i)),
+                int(self.active_color[1] * self.color_amp(i)),
+                int(self.active_color[2] * self.color_amp(i)))
+    def color_amp(self, pos):
         t = float(time.time())
         amp = math.sin(-t*self.mod_speed+pos)
-        return 1.0 -.4 - amp*0.4
+        return (1 + (-.4 - amp*0.4)) * (.5 + .5 * float(pos) / self.pos)
 
 
 if __name__ == '__main__':
