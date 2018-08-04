@@ -6,9 +6,9 @@ class ConsumptionMeter():
     def __init__(self, iq_envoy=None, pixel_count=32, max_lo=2000 ,max_hi=8000):
         self.iq_envoy = iq_envoy
         self.pixel_count = pixel_count
-        self.idle_color = (10, 0,0)
-        self.active_color_lo = (150, 40,00)
-        self.active_color_hi = (220, 20,00)
+        self.idle_color = (8, 3,3)
+        self.active_color_lo = (110, 70,00)
+        self.active_color_hi = (240, 10,00)
         self.max_power_hi = max_hi
         self.max_power_lo = max_lo
         if self.iq_envoy is not None:
@@ -41,7 +41,7 @@ class ConsumptionMeter():
     @property
     def mod_speed(self):
         if self.get_power() < self.max_power_lo:
-            return 1.0
+            return 2.0
         else:
             return 5.0
 
@@ -59,7 +59,7 @@ class ConsumptionMeter():
     def wave_amp(self, pos):
         t = float(time.time())
         amp = math.sin(-t*self.mod_speed+pos)
-        return 1.0 -.3 - amp*0.3
+        return 1.0 -.4 - amp*0.4
 
 
 if __name__ == '__main__':
