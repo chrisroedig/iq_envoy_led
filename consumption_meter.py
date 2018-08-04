@@ -6,9 +6,9 @@ class ConsumptionMeter():
     def __init__(self, iq_envoy=None, pixel_count=32, max_lo=2000 ,max_hi=8000):
         self.iq_envoy = iq_envoy
         self.pixel_count = pixel_count
-        self.idle_color_lo = (3, 1,0)
-        self.idle_color_hi = (5, 0,0)
-        self.active_color_lo = (110, 70,00)
+        self.idle_color_lo = (3, 2,0)
+        self.idle_color_hi = (3, 0,0)
+        self.active_color_lo = (140, 40,00)
         self.active_color_hi = (240, 10,00)
         self.max_power_hi = max_hi
         self.max_power_lo = max_lo
@@ -64,10 +64,13 @@ class ConsumptionMeter():
                 int(self.active_color[1] * self.color_amp(i)),
                 int(self.active_color[2] * self.color_amp(i)))
     def color_amp(self, pos):
+        if pos >= self.pos-1:
+            return 1.0
         t = float(time.time())
         amp = math.sin(-t*self.mod_speed+pos)
-        return (1 + (-.4 - amp*0.4)) * (.5 + .5 * float(pos) / self.pos)
-
+        ramp =  (.2+ .8*float(pos) / self.pos)
+        depth = 0.4
+        return (1 + (-depth - amp*depth)) * ramp
 
 if __name__ == '__main__':
     cm = ConsumptionMeter()
