@@ -6,8 +6,8 @@ class ConsumptionMeter():
     def __init__(self, iq_envoy=None, pixel_count=32, max_lo=2000 ,max_hi=8000):
         self.iq_envoy = iq_envoy
         self.pixel_count = pixel_count
-        self.idle_color_lo = (10, 7,0)
-        self.idle_color_hi = (20, 1,0)
+        self.idle_color_lo = (3, 1,0)
+        self.idle_color_hi = (5, 0,0)
         self.active_color_lo = (110, 70,00)
         self.active_color_hi = (240, 10,00)
         self.max_power_hi = max_hi
