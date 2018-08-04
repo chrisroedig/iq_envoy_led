@@ -6,8 +6,8 @@ class ConsumptionMeter():
     def __init__(self, iq_envoy=None, pixel_count=32, max_lo=2000 ,max_hi=8000):
         self.iq_envoy = iq_envoy
         self.pixel_count = pixel_count
-        self.idle_color_lo = (10, 7,0)
-        self.idle_color_hi = (20, 1,0)
+        self.idle_color_lo = (15, 11,0)
+        self.idle_color_hi = (24, 1, 0)
         self.active_color_lo = (110, 70,00)
         self.active_color_hi = (240, 10,00)
         self.max_power_hi = max_hi
@@ -60,13 +60,13 @@ class ConsumptionMeter():
 
     def modulated_color(self, i):
         return (
-                int(self.active_color[0] * self.wave_amp(i)),
-                int(self.active_color[1] * self.wave_amp(i)),
-                int(self.active_color[2] * self.wave_amp(i)))
-    def wave_amp(self, pos):
+                int(self.active_color[0] * self.color_amp(i)),
+                int(self.active_color[1] * self.color_amp(i)),
+                int(self.active_color[2] * self.color_amp(i)))
+    def color_amp(self, pos):
         t = float(time.time())
         amp = math.sin(-t*self.mod_speed+pos)
-        return 1.0 -.4 - amp*0.4
+        return (1 + (-.4 - amp*0.4)) * (.5 + .5 * float(pos) / self.pos)
 
 
 if __name__ == '__main__':
