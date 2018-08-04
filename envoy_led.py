@@ -32,6 +32,11 @@ class IQEnvoyLed():
             iq_envoy = self.iq_envoy,
             pixel_count = LED_COUNT
         )
+        self.production_meter = production_meter.ConsumptionMeter(
+            iq_envoy = None,
+            pixel_count = LED_COUNT
+        )
+        self.pixel_source = self.consumption_meter
         self.run = False
     def start(self):
         self.run = True
@@ -46,9 +51,16 @@ class IQEnvoyLed():
         self.set_pixels()
         threading.Timer(.05, self.set_pixels_loop).start()
     def set_pixels(self):
-        for i, rgb in enumerate( self.consumption_meter.pixels ):
+        for i, rgb in enumerate( self.pixel_source().pixels ):
             self.strip.setPixelColor(i, Color(rgb[0],rgb[1], rgb[2]))
             self.strip.show()
+    def pixel_source(self):
+        ind = int(time.time()%10 /5)
+        if ind==1:
+            return self.production_meter
+        else:
+            return self.consumption_meter
+
 
 if __name__ == '__main__':
     iqenvoy_led = IQEnvoyLed()
