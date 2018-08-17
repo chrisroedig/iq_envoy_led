@@ -16,6 +16,7 @@ LED_BRIGHTNESS = 127     # Set to 0 for darkest and 255 for brightest
 LED_INVERT     = False   # True to invert the signal (when using NPN transistor level shift)
 LED_CHANNEL    = 0       # set to '1' for GPIOs 13, 19, 41, 45 or 53
 
+
 class IQEnvoyLed():
     def __init__(self):
         self.strip = Adafruit_NeoPixel(
@@ -51,7 +52,7 @@ class IQEnvoyLed():
         threading.Timer(.05, self.set_pixels_loop).start()
     def set_pixels(self):
         for i, rgb in enumerate( self.pixel_source().pixels ):
-            self.strip.setPixelColor(i, Color(rgb[0],rgb[1], rgb[2]))
+            self.strip.setPixelColor(i, Color(rgb[1],rgb[0], rgb[2]))
             self.strip.show()
     def pixel_source(self):
         ind = int(time.time()%20)
