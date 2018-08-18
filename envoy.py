@@ -13,7 +13,7 @@ class IQEnvoy():
     def get_data(self):
         self.home_data = self.get_home_data()
         self.production_data = self.get_production_data()
-        self.inventory_data = self.get_inventory_data()
+        # self.inventory_data = self.get_inventory_data()
 
     def get_home_data(self):
         return self.json_request('home')
