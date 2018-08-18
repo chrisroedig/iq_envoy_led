@@ -29,11 +29,7 @@ class IQEnvoyLed():
                 LED_CHANNEL)
         self.strip.begin()
         self.iq_envoy = envoy.IQEnvoy()
-        self.consumption_meter = consumption_meter.ConsumptionMeter(
-            iq_envoy = self.iq_envoy,
-            pixel_count = LED_COUNT
-        )
-        self.production_meter = production_meter.ProductionMeter(
+        self.exim_meter = import_export_meter.ImportExportMeter
             iq_envoy = self.iq_envoy,
             pixel_count = LED_COUNT
         )
@@ -55,11 +51,7 @@ class IQEnvoyLed():
             self.strip.setPixelColor(i, Color(rgb[1],rgb[0], rgb[2]))
             self.strip.show()
     def pixel_source(self):
-        ind = int(time.time()%20)
-        if ind > 10:
-            return self.production_meter
-        else:
-            return self.consumption_meter
+        return self.exim_meter
 
 
 if __name__ == '__main__':

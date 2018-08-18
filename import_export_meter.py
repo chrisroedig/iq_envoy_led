@@ -31,11 +31,26 @@ class ImportExportMeter():
         self.speeds = [2.0, 3.0, 4.0]
         self.mod_depth = 0.4
         self.mod_period = float(pixel_count) / ( 16.0 * math.pi )
+        if self.iq_envoy is not None:
+            self.get_consumed_power = self.get_iq_envoy_consumption_power
+            self.get_produced_power = self.get_iq_envoy_inverter_power
 
+    @property
+    def pixels(self):
+        if self.produced_power < self.consumed_power:
+            return self.convert_pixels(self.pixels_importing)
+        else:
+            return self.convert_pixels(self.pixels_exporting)
+
+    def convert_pixels(self, pixels):
+        return [self.convert_pixel(p) for p in pixels ]
+
+    def convert_pixel(self, pixel):
+        return int(255*pixel[0]), int(255*pixel[1]), int(255*pixel[2])
+    @property
     def pixels_importing(self):
         arr = [self.bg_color]*self.pixel_count
         for i in range(self.pixel_count):
-            print self.power_at_index(i)
             if self.power_at_index(i) < self.produced_power:
                 arr[i] = self.modulated_color(i, 'produced')
             elif self.power_at_index(i) < self.consumed_power:
@@ -43,13 +58,17 @@ class ImportExportMeter():
         arr[self.index_at_power(self.consumed_power)] = self.marker_color
         return arr
 
+    @property
+    def pixels_exporting(self):
+        arr = [self.bg_color]*self.pixel_count
+        for i in range(self.pixel_count):
+            if self.power_at_index(i) < self.consumed_power:
+                arr[i] = self.modulated_color(i, 'produced')
+            elif self.power_at_index(i) < self.produced_power:
+                arr[i] = self.modulated_color(i, 'exported')
+        arr[self.index_at_power(self.consumed_power)] = self.marker_color
+        return arr
 
-    def fixed_color(self, type=None, amp=1.0):
-        return self.hsv_color(
-            color=self.colors.get(type, self.bg_color),
-            sat=self.saturations[self.current_range],
-            amp=amp
-        )
     def modulated_color(self, pixel_id, type=None, reverse=False):
         t = float(time.time())
         t = -1*t*reverse + t*( not reverse)
@@ -57,6 +76,13 @@ class ImportExportMeter():
         amp = math.sin(t*self.speeds[self.current_range]+theta)
         amp = 1 - self.mod_depth * amp
         return self.fixed_color(type, amp)
+
+    def fixed_color(self, type=None, amp=1.0):
+        return self.hsv_color(
+            color=self.colors.get(type, self.bg_color),
+            sat=self.saturations[self.current_range],
+            amp=amp
+        )
 
     @property
     def current_range(self):
@@ -67,9 +93,13 @@ class ImportExportMeter():
                     if self.total_power<b ][-1][0]
 
     def index_at_power(self, pwr):
+        if pwr > self.range_boundaries[self.current_range]:
+            return self.pixel_count - 1
         return int(self.pixel_count * float(pwr) / self.range_boundaries[self.current_range] )
+
     def power_at_index(self, i):
         return self.range_boundaries[self.current_range] * float(i)/float(self.pixel_count)
+
     @property
     def total_power(self):
         return max(self.produced_power, self.consumed_power)
@@ -86,6 +116,12 @@ class ImportExportMeter():
         return 4000
     def get_produced_power(self):
         return 900
+
+    def get_iq_envoy_inverter_power(self):
+        return self.iq_envoy.inverter_power
+
+    def get_iq_envoy_consumption_power(self):
+        return self.iq_envoy.consumption_power
 
     def hsv_color(self, color=(1.0, 1.0, 1.0), amp=1.0, sat=1.0):
         hsvc = colorsys.rgb_to_hsv(*color)
