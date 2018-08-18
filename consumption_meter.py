@@ -3,7 +3,7 @@ import random
 import time
 
 class ConsumptionMeter():
-    def __init__(self, iq_envoy=None, pixel_count=32, max_lo=2000 ,max_hi=8000):
+    def __init__(self, iq_envoy=None, pixel_count=32, max_lo=1600 ,max_hi=6400):
         self.iq_envoy = iq_envoy
         self.pixel_count = pixel_count
         self.idle_color_lo = (3, 2,0)

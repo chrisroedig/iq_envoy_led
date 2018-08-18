@@ -2,6 +2,7 @@ import threading
 import envoy
 import production_meter
 import consumption_meter
+import import_export_meter
 import signal
 import sys
 import time
@@ -11,10 +12,11 @@ LED_COUNT      = 32      # Number of LED pixels.
 LED_PIN        = 18      # GPIO pin connected to the pixels (18 uses PWM!).
 LED_FREQ_HZ    = 800000  # LED signal frequency in hertz (usually 800khz)
 LED_DMA        = 10       # DMA channel to use for generating signal (try 5)
-LED_BRIGHTNESS = 127     # Set to 0 for darkest and 255 for brightest
+LED_BRIGHTNESS = 64     # Set to 0 for darkest and 255 for brightest
 
 LED_INVERT     = False   # True to invert the signal (when using NPN transistor level shift)
 LED_CHANNEL    = 0       # set to '1' for GPIOs 13, 19, 41, 45 or 53
+LED_STRIP      = ws.SK6812_STRIP_RGBW
 
 
 class IQEnvoyLed():
@@ -26,10 +28,11 @@ class IQEnvoyLed():
                 LED_DMA,
                 LED_INVERT,
                 LED_BRIGHTNESS,
-                LED_CHANNEL)
+                LED_CHANNEL,
+                LED_STRIP)
         self.strip.begin()
         self.iq_envoy = envoy.IQEnvoy()
-        self.exim_meter = import_export_meter.ImportExportMeter
+        self.exim_meter = import_export_meter.ImportExportMeter(
             iq_envoy = self.iq_envoy,
             pixel_count = LED_COUNT
         )
@@ -45,10 +48,10 @@ class IQEnvoyLed():
         if self.run is not True:
             return
         self.set_pixels()
-        threading.Timer(.05, self.set_pixels_loop).start()
+        threading.Timer(.02, self.set_pixels_loop).start()
     def set_pixels(self):
         for i, rgb in enumerate( self.pixel_source().pixels ):
-            self.strip.setPixelColor(i, Color(rgb[1],rgb[0], rgb[2]))
+            self.strip.setPixelColor(i, Color(rgb[1],rgb[0], rgb[2],rgb[3]))
             self.strip.show()
     def pixel_source(self):
         return self.exim_meter

@@ -20,17 +20,17 @@ class ImportExportMeter():
         self.iq_envoy = iq_envoy
         self.pixel_count = pixel_count
         self.range_boundaries = ranges
-        self.marker_color = (1.00, 1.00, 1.00)
-        self.bg_color = (0.10, 0.10, 0.10)
+        self.marker_color = (0.90, 0.20, 0.00, 0.3)
+        self.bg_color = (0.0, 0.0, 0.0, 0.10)
         self.colors = {
             'produced': (0.00, 0.40, 1.00),
             'consumed': (1.00, 0.18, 0.00),
             'exported': (0.00, 1.00, 0.58)
             }
-        self.saturations = [0.50, 0.75, 1.00]
-        self.speeds = [2.0, 3.0, 4.0]
-        self.mod_depth = 0.4
-        self.mod_period = float(pixel_count) / ( 16.0 * math.pi )
+        self.saturations = [0.95, 0.97, 1.00]
+        self.speeds = [1.0, 1.5, 2.0]
+        self.mod_depth = 0.45
+        self.mod_period = float(pixel_count) / ( 8.0 * math.pi )
         if self.iq_envoy is not None:
             self.get_consumed_power = self.get_iq_envoy_consumption_power
             self.get_produced_power = self.get_iq_envoy_inverter_power
@@ -46,15 +46,15 @@ class ImportExportMeter():
         return [self.convert_pixel(p) for p in pixels ]
 
     def convert_pixel(self, pixel):
-        return int(255*pixel[0]), int(255*pixel[1]), int(255*pixel[2])
+        return int(255*pixel[0]), int(255*pixel[1]), int(255*pixel[2]), int(255*pixel[3])
     @property
     def pixels_importing(self):
         arr = [self.bg_color]*self.pixel_count
         for i in range(self.pixel_count):
             if self.power_at_index(i) < self.produced_power:
-                arr[i] = self.modulated_color(i, 'produced')
+                arr[i] = self.modulated_color(i, 'produced', True)+(0,)
             elif self.power_at_index(i) < self.consumed_power:
-                arr[i] = self.modulated_color(i, 'consumed', True)
+                arr[i] = self.modulated_color(i, 'consumed')+(0,)
         arr[self.index_at_power(self.consumed_power)] = self.marker_color
         return arr
 
@@ -71,10 +71,10 @@ class ImportExportMeter():
 
     def modulated_color(self, pixel_id, type=None, reverse=False):
         t = float(time.time())
-        t = -1*t*reverse + t*( not reverse)
+        t = -1.0*t*reverse + t*1.0*( not reverse)
         theta = float(pixel_id) / self.mod_period
         amp = math.sin(t*self.speeds[self.current_range]+theta)
-        amp = 1 - self.mod_depth * amp
+        amp = 1 - self.mod_depth + self.mod_depth * amp
         return self.fixed_color(type, amp)
 
     def fixed_color(self, type=None, amp=1.0):
@@ -133,3 +133,4 @@ class ImportExportMeter():
 if __name__ == '__main__':
     cm = ImportExportMeter()
     print cm.pixels
+    print cm.pixels_importing

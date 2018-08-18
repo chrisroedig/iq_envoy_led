@@ -3,7 +3,7 @@ import random
 import time
 
 class ProductionMeter():
-    def __init__(self, iq_envoy=None, pixel_count=32, max_power = 2000):
+    def __init__(self, iq_envoy=None, pixel_count=32, max_power = 1500):
         self.iq_envoy = iq_envoy
         self.pixel_count = pixel_count
         self.idle_color = (0, 2, 5)
