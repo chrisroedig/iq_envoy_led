@@ -16,12 +16,13 @@ import colorsys
 #
 
 class ImportExportMeter():
-    def __init__(self, iq_envoy=None, pixel_count=32, ranges=(1600, 3200, 6400)):
+    def __init__(self, iq_envoy=None, pixel_count=32, ranges=(1600, 3200, 6400), grid = 400):
         self.iq_envoy = iq_envoy
         self.pixel_count = pixel_count
         self.range_boundaries = ranges
+        self.range_grid = grid
         self.marker_color = (0.90, 0.20, 0.00, 0.3)
-        self.bg_color = (0.0, 0.0, 0.0, 0.10)
+        self.bg_color = (0.0, 0.0, 0.0, 0.01)
         self.colors = {
             'produced': (0.00, 0.40, 1.00),
             'consumed': (1.00, 0.18, 0.00),
@@ -37,36 +38,41 @@ class ImportExportMeter():
 
     @property
     def pixels(self):
+        arr = [self.bg_color]*self.pixel_count
         if self.produced_power < self.consumed_power:
-            return self.convert_pixels(self.pixels_importing)
+            arr = self.add_pixels_importing(arr)
         else:
-            return self.convert_pixels(self.pixels_exporting)
+            arr = self.add_pixels_exporting(arr)
+        arr = self.mod_gridline_pixels(arr)
+        return self.convert_pixels(arr)
 
     def convert_pixels(self, pixels):
         return [self.convert_pixel(p) for p in pixels ]
 
     def convert_pixel(self, pixel):
         return int(255*pixel[0]), int(255*pixel[1]), int(255*pixel[2]), int(255*pixel[3])
-    @property
-    def pixels_importing(self):
-        arr = [self.bg_color]*self.pixel_count
+
+    def add_pixels_importing(self, arr):
         for i in range(self.pixel_count):
             if self.power_at_index(i) < self.produced_power:
                 arr[i] = self.modulated_color(i, 'produced', True)+(0,)
             elif self.power_at_index(i) < self.consumed_power:
                 arr[i] = self.modulated_color(i, 'consumed')+(0,)
-        arr[self.index_at_power(self.consumed_power)] = self.marker_color
         return arr
 
-    @property
-    def pixels_exporting(self):
-        arr = [self.bg_color]*self.pixel_count
+    def add_pixels_exporting(self, arr):
         for i in range(self.pixel_count):
             if self.power_at_index(i) < self.consumed_power:
-                arr[i] = self.modulated_color(i, 'produced')
+                arr[i] = self.modulated_color(i, 'produced')+(0,)
             elif self.power_at_index(i) < self.produced_power:
-                arr[i] = self.modulated_color(i, 'exported')
-        arr[self.index_at_power(self.consumed_power)] = self.marker_color
+                arr[i] = self.modulated_color(i, 'exported')+(0,)
+        return arr
+
+    def mod_gridline_pixels(self,arr):
+        count = self.range_boundaries[self.current_range] / self.range_grid
+        for i in range(count):
+            k = self.index_at_power(i*self.range_grid+0.5*self.range_grid)
+            arr[k] = (arr[k][0:3] + (0.2,))
         return arr
 
     def modulated_color(self, pixel_id, type=None, reverse=False):
@@ -133,4 +139,3 @@ class ImportExportMeter():
 if __name__ == '__main__':
     cm = ImportExportMeter()
     print cm.pixels
-    print cm.pixels_importing
