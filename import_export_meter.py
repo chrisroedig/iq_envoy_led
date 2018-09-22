@@ -16,7 +16,7 @@ import colorsys
 #
 
 class ImportExportMeter():
-    def __init__(self, iq_envoy=None, pixel_count=32, ranges=(1600, 3200, 8000), grid = 800):
+    def __init__(self, iq_envoy=None, pixel_count=32, ranges=(1600, 3200, 6400), grid = 800):
         self.iq_envoy = iq_envoy
         self.pixel_count = pixel_count
         self.range_boundaries = ranges
@@ -73,6 +73,8 @@ class ImportExportMeter():
         for i in range(count):
             pwr = i*self.range_grid
             k = self.index_at_power(pwr)
+            if k >= len(arr):
+                continue
             if pwr < self.total_power:
                 arr[k] = (arr[k][0:3] + (0.3,))
             else:

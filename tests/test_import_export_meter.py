@@ -17,3 +17,10 @@ def test_power_range_ramp():
     for p in range(100):
         mt.consumed_power = float(p*100)
         assert(isinstance(mt.meter.current_range,int))
+
+def test_gridlines_ramp():
+    mt = MeterTest()
+    for p in range(100):
+        mt.consumed_power = float(p*100)
+        arr = [mt.meter.bg_color]*mt.meter.pixel_count
+        assert(isinstance(mt.meter.mod_gridline_pixels(arr),list))
