@@ -69,7 +69,7 @@ class ImportExportMeter():
         return arr
 
     def mod_gridline_pixels(self,arr):
-        count = self.range_boundaries[self.current_range] / self.range_grid
+        count = int(self.range_boundaries[self.current_range] / self.range_grid)
         for i in range(count):
             k = self.index_at_power(i*self.range_grid+0.5*self.range_grid)
             arr[k] = (arr[k][0:3] + (0.2,))
@@ -94,6 +94,8 @@ class ImportExportMeter():
     def current_range(self):
         if self.total_power < self.range_boundaries[0]:
             return 0
+        if self.total_power >= self.range_boundaries[-1]:
+            return len(self.range_boundaries) -1
         return [ (i,b) for (i, b)
                     in enumerate(self.range_boundaries)
                     if self.total_power<b ][-1][0]
@@ -138,4 +140,4 @@ class ImportExportMeter():
 
 if __name__ == '__main__':
     cm = ImportExportMeter()
-    print cm.pixels
+    print(cm.pixels)
