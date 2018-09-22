@@ -16,7 +16,7 @@ import colorsys
 #
 
 class ImportExportMeter():
-    def __init__(self, iq_envoy=None, pixel_count=32, ranges=(1600, 3200, 6400), grid = 400):
+    def __init__(self, iq_envoy=None, pixel_count=32, ranges=(1600, 3200, 8000), grid = 800):
         self.iq_envoy = iq_envoy
         self.pixel_count = pixel_count
         self.range_boundaries = ranges
@@ -26,7 +26,7 @@ class ImportExportMeter():
         self.colors = {
             'produced': (0.00, 0.40, 1.00),
             'consumed': (1.00, 0.18, 0.00),
-            'exported': (0.00, 1.00, 0.58)
+            'exported': (0.00, 1.00, 0.35)
             }
         self.saturations = [0.95, 0.97, 1.00]
         self.speeds = [1.0, 1.5, 2.0]
@@ -63,16 +63,20 @@ class ImportExportMeter():
     def add_pixels_exporting(self, arr):
         for i in range(self.pixel_count):
             if self.power_at_index(i) < self.consumed_power:
-                arr[i] = self.modulated_color(i, 'produced')+(0,)
+                arr[i] = self.modulated_color(i, 'produced', True)+(0,)
             elif self.power_at_index(i) < self.produced_power:
-                arr[i] = self.modulated_color(i, 'exported')+(0,)
+                arr[i] = self.modulated_color(i, 'exported', True)+(0,)
         return arr
 
     def mod_gridline_pixels(self,arr):
         count = int(self.range_boundaries[self.current_range] / self.range_grid)
         for i in range(count):
-            k = self.index_at_power(i*self.range_grid+0.5*self.range_grid)
-            arr[k] = (arr[k][0:3] + (0.2,))
+            pwr = i*self.range_grid
+            k = self.index_at_power(pwr)
+            if pwr < self.total_power:
+                arr[k] = (arr[k][0:3] + (0.3,))
+            else:
+                arr[k] = (arr[k][0:3] + (0.1,))
         return arr
 
     def modulated_color(self, pixel_id, type=None, reverse=False):
