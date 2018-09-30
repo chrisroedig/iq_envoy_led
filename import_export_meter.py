@@ -33,7 +33,7 @@ class ImportExportMeter():
         self.current_speed = 0.0
         if self.iq_envoy is not None:
             self.iq_envoy.on_new_data = self.new_data
-    
+
     def new_data(self, data):
         self.produced_power = data['watts_producing']
         self.consumed_power = data['watts_consuming']
@@ -57,7 +57,7 @@ class ImportExportMeter():
     def add_pixels_importing(self, arr):
         for i in range(self.pixel_count):
             if self.power_at_index(i) < self.produced_power:
-                arr[i] = self.modulated_color(i, 'produced', True)+(0,)
+                arr[i] = self.fixed_color('produced')+(0,)
             else:
                 arr[i] = self.modulated_color(i, 'consumed')+(0,)
         return arr
@@ -65,7 +65,7 @@ class ImportExportMeter():
     def add_pixels_exporting(self, arr):
         for i in range(self.pixel_count):
             if self.power_at_index(i) < self.consumed_power:
-                arr[i] = self.modulated_color(i, 'produced', True)+(0,)
+                arr[i] = self.fixed_color('produced')+(0,)
             else:
                 arr[i] = self.modulated_color(i, 'exported', True)+(0,)
         return arr
