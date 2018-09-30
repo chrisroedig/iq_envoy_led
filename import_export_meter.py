@@ -22,19 +22,28 @@ class ImportExportMeter():
         self.range_boundaries = ranges
         self.range_grid = grid
         self.marker_color = (0.90, 0.20, 0.00, 0.3)
-        self.bg_color = (0.0, 0.0, 0.0, 0.01)
+        self.bg_color = (0.0, 0.0, 0.0, 0.05)
         self.colors = {
-            'produced': (0.00, 0.40, 1.00),
+            'produced': (0.00, 0.20, 1.00),
             'consumed': (1.00, 0.18, 0.00),
-            'exported': (0.00, 1.00, 0.35)
+            'exported': (0.00, 1.00, 0.25)
             }
         self.saturations = [0.95, 0.97, 1.00]
-        self.speeds = [1.0, 1.5, 2.0]
+        self.speeds = [3.0, 1.5, 2.0]
         self.mod_depth = 0.45
-        self.mod_period = float(pixel_count) / ( 8.0 * math.pi )
+        self.mod_period = float(pixel_count) / ( 4.0 * math.pi )
+        self.produced_power = 0.0
+        self.consumed_power = 0.0
+        self.current_range = 0
+        self.current_speed = 0.0
         if self.iq_envoy is not None:
-            self.get_consumed_power = self.get_iq_envoy_consumption_power
-            self.get_produced_power = self.get_iq_envoy_inverter_power
+            self.iq_envoy.on_new_data = self.new_data
+    
+    def new_data(self, data):
+        self.produced_power = data['watts_producing']
+        self.consumed_power = data['watts_consuming']
+        self.set_current_range()
+        self.set_current_speed()
 
     @property
     def pixels(self):
@@ -43,14 +52,13 @@ class ImportExportMeter():
             arr = self.add_pixels_importing(arr)
         else:
             arr = self.add_pixels_exporting(arr)
-        arr = self.mod_gridline_pixels(arr)
         return self.convert_pixels(arr)
 
     def convert_pixels(self, pixels):
         return [self.convert_pixel(p) for p in pixels ]
 
     def convert_pixel(self, pixel):
-        return int(255*pixel[0]), int(255*pixel[1]), int(255*pixel[2]), int(255*pixel[3])
+        return int(255*pixel[0]), int(255*pixel[1]), int(255*pixel[2]), int(255*0.02) #int(255*pixel[3])
 
     def add_pixels_importing(self, arr):
         for i in range(self.pixel_count):
@@ -85,7 +93,7 @@ class ImportExportMeter():
         t = float(time.time())
         t = -1.0*t*reverse + t*1.0*( not reverse)
         theta = float(pixel_id) / self.mod_period
-        amp = math.sin(t*self.speeds[self.current_range]+theta)
+        amp = math.sin(t*self.current_speed+theta)
         amp = 1 - self.mod_depth + self.mod_depth * amp
         return self.fixed_color(type, amp)
 
@@ -95,14 +103,15 @@ class ImportExportMeter():
             sat=self.saturations[self.current_range],
             amp=amp
         )
+    def set_current_speed(self):
+        self.current_speed = math.ceil(self.total_power / 50) / 30
 
-    @property
-    def current_range(self):
+    def set_current_range(self):
         if self.total_power < self.range_boundaries[0]:
             return 0
         if self.total_power >= self.range_boundaries[-1]:
             return len(self.range_boundaries) -1
-        return [ (i,b) for (i, b)
+        self.current_range = [ (i,b) for (i, b)
                     in enumerate(self.range_boundaries)
                     if self.total_power<b ][-1][0]
 
@@ -117,25 +126,6 @@ class ImportExportMeter():
     @property
     def total_power(self):
         return max(self.produced_power, self.consumed_power)
-
-    @property
-    def consumed_power(self):
-        return self.get_consumed_power()
-
-    @property
-    def produced_power(self):
-        return self.get_produced_power()
-
-    def get_consumed_power(self):
-        return 4000
-    def get_produced_power(self):
-        return 900
-
-    def get_iq_envoy_inverter_power(self):
-        return self.iq_envoy.inverter_power
-
-    def get_iq_envoy_consumption_power(self):
-        return self.iq_envoy.consumption_power
 
     def hsv_color(self, color=(1.0, 1.0, 1.0), amp=1.0, sat=1.0):
         hsvc = colorsys.rgb_to_hsv(*color)

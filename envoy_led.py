@@ -48,11 +48,12 @@ class IQEnvoyLed():
         if self.run is not True:
             return
         self.set_pixels()
-        threading.Timer(.02, self.set_pixels_loop).start()
+        threading.Timer(.025, self.set_pixels_loop).start()
     def set_pixels(self):
-        for i, rgb in enumerate( self.pixel_source().pixels ):
+        pixels = self.pixel_source().pixels 
+        for i, rgb in enumerate( pixels ):
             self.strip.setPixelColor(i, Color(rgb[1],rgb[0], rgb[2],rgb[3]))
-            self.strip.show()
+        self.strip.show()
     def pixel_source(self):
         return self.exim_meter
 

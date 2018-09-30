@@ -11,10 +11,14 @@ class IQEnvoy():
         self.poll_timer = None
 
     def get_data(self):
-        self.home_data = self.get_home_data()
         self.production_data = self.get_production_data()
-        # self.inventory_data = self.get_inventory_data()
-
+        self.on_new_data({
+            'watts_producing': self.inverter_power, 
+            'watts_consuming': self.consumption_power
+            })
+    def on_new_data(self, data):
+        # override with callback
+        pass
     def get_home_data(self):
         return self.json_request('home')
 
