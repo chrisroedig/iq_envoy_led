@@ -1,5 +1,8 @@
 import requests
 from threading import Timer
+import time
+import sys
+import signal
 
 class IQEnvoy():
     def __init__(self, **kwargs):
@@ -11,10 +14,19 @@ class IQEnvoy():
         self.poll_timer = None
 
     def get_data(self):
-        self.production_data = self.get_production_data()
+        try:
+            self.production_data = self.get_production_data()
+        except Exception as ex:
+            print('failed to get data')
+            print(ex)
+            return
         self.on_new_data({
-            'watts_producing': self.inverter_power, 
-            'watts_consuming': self.consumption_power
+            'watts_producing': self.inverter_power,
+            'watts_consuming': self.consumption_power,
+            'watts_avg_7d_consumption': self.avg_7d_consumption,
+            'watts_avg_7d_production': self.avg_7d_production,
+            'wh_today_consumed' : self.today_consumption,
+            'wh_today_produced' : self.today_production
             })
     def on_new_data(self, data):
         # override with callback
@@ -57,6 +69,32 @@ class IQEnvoy():
             return 0.0
         return self.inverter_production['wNow']
 
+    @property
+    def avg_7d_consumption(self):
+        if self.total_consumption is None:
+            return 0.0
+        return self.total_consumption['whLastSevenDays'] / (7*24)
+
+    @property
+    def avg_7d_production(self):
+        if self.inverter_production is None:
+            return 0.0
+        return self.inverter_production['whLastSevenDays'] / (7*24)
+
+    @property
+    def today_consumption(self):
+        if self.total_consumption is None:
+            return 0.0
+        return self.total_consumption['whToday']
+
+    @property
+    def today_production(self):
+        if self.inverter_production is None:
+            return 0.0
+        return self.inverter_production['whToday']
+
+
+
     def start_polling(self):
         if self.polling_active == True:
             return
@@ -72,3 +110,19 @@ class IQEnvoy():
     def stop_polling(self):
         self.polling_active = False
         self.poll_timer = None
+
+
+if __name__ == '__main__':
+    def new_data_handler(data):
+        print('got new data')
+        print(data)
+    e = IQEnvoy()
+    def signal_handler(signal, frame):
+        print('You pressed Ctrl+C!')
+        e.stop_polling()
+        sys.exit(0)
+    signal.signal(signal.SIGINT, signal_handler)
+    e.on_new_data = new_data_handler
+    e.start_polling()
+    while True:
+        time.sleep(.25)
