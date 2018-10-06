@@ -6,12 +6,12 @@ import colorsys
 # Visualization Idea
 #
 #  Importing Power:
-#  |>>>>>>><<<<<<<<<<#-----------|
-#  |  blue |  amber  |   bg      |
+#  |.......<<<<<<<<<<|
+#  |  blue |  amber  |
 #
 #  Exporting Power:
-#  |>>>>>>>>>#>>>>>>>>>----------|
-#  |   blue  |  green |  bg      |
+#  |.........>>>>>>>>>|
+#  |   blue  |  green |
 #
 #
 
@@ -31,6 +31,7 @@ class ImportExportMeter():
         self.consumed_power = 0.0
         self.current_range = 0
         self.current_speed = 0.0
+        self.speed_history = [3.0]*10
         if self.iq_envoy is not None:
             self.iq_envoy.on_new_data = self.new_data
 
@@ -86,7 +87,10 @@ class ImportExportMeter():
             amp=amp
         )
     def set_current_speed(self):
-        self.current_speed = math.ceil(self.total_power / 50) / 30
+        self.speed_history = self.speed_history[1:]+round([self.total_power/150],2)
+        self.current_speed = round(
+            sum(self.speed_history)/len(self.speed_history),
+            2)
 
     def index_at_power(self, pwr):
         if pwr > self.total_power:
