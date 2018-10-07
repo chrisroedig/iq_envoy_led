@@ -31,6 +31,8 @@ class ImportExportMeter():
         self.consumed_power = 0.0
         self.current_range = 0
         self.current_speed = 0.0
+        self.current_phase = 0.0
+        self.current_time = float(time.time())
         self.speed_history = [3.0]*10
         if self.iq_envoy is not None:
             self.iq_envoy.on_new_data = self.new_data
@@ -56,6 +58,7 @@ class ImportExportMeter():
         return int(255*pixel[0]), int(255*pixel[1]), int(255*pixel[2]), int(255*pixel[3])
 
     def add_pixels_importing(self, arr):
+        self.update_time_phase()
         for i in range(self.pixel_count):
             if self.power_at_index(i) < self.produced_power:
                 arr[i] = self.fixed_color('produced')+(0,)
@@ -64,6 +67,7 @@ class ImportExportMeter():
         return arr
 
     def add_pixels_exporting(self, arr):
+        self.update_time_phase()
         for i in range(self.pixel_count):
             if self.power_at_index(i) < self.consumed_power:
                 arr[i] = self.fixed_color('produced')+(0,)
@@ -71,12 +75,17 @@ class ImportExportMeter():
                 arr[i] = self.modulated_color(i, 'exported', True)+(0,)
         return arr
 
+    def update_time_phase(self):
+        t = float(time.time())
+        dt = t - self.current_time
+        self.current_time = t
+        self.current_phase = self.current_phase + dt*self.current_speed
 
     def modulated_color(self, pixel_id, type=None, reverse=False):
-        t = float(time.time())
-        t = -1.0*t*reverse + t*1.0*( not reverse)
         theta = float(pixel_id) / self.mod_period
-        amp = math.sin(t*self.current_speed+theta)
+        phi = self.current_phase
+        phi = -1.0*phi*reverse + phi*1.0*( not reverse)
+        amp = math.sin(phi + theta)
         amp = 1 - self.mod_depth + self.mod_depth * amp
         return self.fixed_color(type, amp)
 
@@ -87,7 +96,7 @@ class ImportExportMeter():
             amp=amp
         )
     def set_current_speed(self):
-        self.speed_history = self.speed_history[1:]+round([self.total_power/150],2)
+        self.speed_history = self.speed_history[1:]+[round(self.total_power/150,2)]
         self.current_speed = round(
             sum(self.speed_history)/len(self.speed_history),
             2)
@@ -113,4 +122,8 @@ class ImportExportMeter():
 
 if __name__ == '__main__':
     cm = ImportExportMeter()
-    print(cm.pixels)
+    cm.consumed_power = 2000.0
+    cm.set_current_speed()
+    for j in range(100):
+        print(cm.pixels)
+        time.sleep(0.1)
