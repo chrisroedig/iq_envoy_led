@@ -33,7 +33,6 @@ class ImportExportMeter():
         self.current_speed = 0.0
         self.current_phase = 0.0
         self.current_time = float(time.time())
-        self.speed_history = [3.0]*10
         if self.iq_envoy is not None:
             self.iq_envoy.on_new_data = self.new_data
 
@@ -96,10 +95,7 @@ class ImportExportMeter():
             amp=amp
         )
     def set_current_speed(self):
-        self.speed_history = self.speed_history[1:]+[round(self.total_power/150,2)]
-        self.current_speed = round(
-            sum(self.speed_history)/len(self.speed_history),
-            2)
+        self.current_speed = round(self.total_power/1500,2)
 
     def index_at_power(self, pwr):
         if pwr > self.total_power:
