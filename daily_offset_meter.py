@@ -12,7 +12,7 @@ import colorsys
 #  |EEEEEEEEEEBBEE....|
 #
 
-class ImportExportMeter():
+class DailyOffsetMeter():
     def __init__(self, iq_envoy=None, pixel_count=32):
         self.iq_envoy = iq_envoy
         self.bg_color = (0.0, 0.0, 0.0, 0.05)
@@ -38,7 +38,7 @@ class ImportExportMeter():
         arr[int(math.ceil(self.pixel_count*self.marker_position))] = self.colors['marker']
         return arr
     def add_offset_pixels(self, arr):
-        color = self.colors['exporting'] if self.exporting else self.colors['exporting']
+        color = self.colors['exporting'] if self.exporting else self.colors['importing']
         top_pixel = int(math.ceil(self.offset * self.marker_position * self.pixel_count))
         for i in range(min(top_pixel, self.pixel_count)):
             arr[i] = color
@@ -54,7 +54,7 @@ class ImportExportMeter():
         self.exporting = self.offset > 1.0
 
 if __name__ == '__main__':
-    cm = ImportExportMeter()
+    cm = DailyOffsetMeter()
     cm.offset = .80
     cm.exporting = False
     print(cm.pixels)
