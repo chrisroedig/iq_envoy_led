@@ -30,7 +30,7 @@ class IQEnvoy():
             'wh_today_produced' : self.today_production
             })
     def on_new_data(self, data):
-        for fn in data_callbacks:
+        for fn in self.data_callbacks:
             fn(data)
     def get_home_data(self):
         return self.json_request('home')

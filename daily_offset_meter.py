@@ -17,7 +17,7 @@ class DailyOffsetMeter():
         self.iq_envoy = iq_envoy
         self.bg_color = (0.0, 0.0, 0.0, 0.05)
         self.pixel_count = pixel_count
-        self.marker_position = 0.75
+        self.marker_position = 0.70
         self.colors = {
             'marker': (0.00, 0.20, 1.00, 0.0),
             'importing': (1.00, 0.18, 0.00, 0.0),
