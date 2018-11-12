@@ -12,6 +12,7 @@ class IQEnvoy():
         self.inventory_data = None
         self.polling_active = False
         self.poll_timer = None
+        self.data_callbacks = []
 
     def get_data(self):
         try:
@@ -29,8 +30,8 @@ class IQEnvoy():
             'wh_today_produced' : self.today_production
             })
     def on_new_data(self, data):
-        # override with callback
-        pass
+        for fn in data_callbacks:
+            fn(data)
     def get_home_data(self):
         return self.json_request('home')
 

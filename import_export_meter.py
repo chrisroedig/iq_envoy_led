@@ -30,7 +30,7 @@ class ImportExportMeter():
         self.current_phase = 0.0
         self.current_time = float(time.time())
         if self.iq_envoy is not None:
-            self.iq_envoy.on_new_data = self.new_data
+            self.iq_envoy.data_callbacks.append(self.new_data)
 
     def new_data(self, data):
         self.produced_power = data['watts_producing']

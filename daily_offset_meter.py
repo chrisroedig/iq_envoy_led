@@ -26,7 +26,7 @@ class ImportExportMeter():
         self.offset = 0.0
         self.exporting = False
         if self.iq_envoy is not None:
-            self.iq_envoy.on_new_data = self.new_data
+            self.iq_envoy.data_callbacks.append(self.new_data)
     @property
     def pixels(self):
         arr = [self.bg_color]*self.pixel_count
