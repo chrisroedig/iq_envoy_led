@@ -6,14 +6,10 @@ import colorsys
 # Visualization Idea
 #
 #  Importing Power:
-#  |.......<<<<<<<<<<|
-#  |  blue |  amber  |
+#  |PPPPPPPP<C<C<C<C<C|
 #
 #  Exporting Power:
-#  |.........>>>>>>>>>|
-#  |   blue  |  green |
-#
-#
+#  |PPPPPPPPP>E>E>E>E>|
 
 class ImportExportMeter():
     def __init__(self, iq_envoy=None, pixel_count=32):
