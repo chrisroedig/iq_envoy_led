@@ -78,7 +78,7 @@ class ImportExportMeter():
         t = float(time.time())
         dt = t - self.current_time
         self.current_time = t
-        self.current_phase = self.current_phase + dt*self.current_speed
+        self.current_phase = self.current_phase + 2*math.pi*dt*self.current_speed
 
     def modulated_color(self, pixel_id, type=None, reverse=False):
         theta = float(pixel_id) / self.mod_period
@@ -95,7 +95,7 @@ class ImportExportMeter():
             amp=amp
         )
     def set_current_speed(self):
-        self.current_speed = round(self.total_power/1500,2)
+        self.current_speed = round(self.total_power/10000,2)
 
     def index_at_power(self, pwr):
         if pwr > self.total_power:
