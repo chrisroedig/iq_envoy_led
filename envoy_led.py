@@ -1,11 +1,11 @@
 import threading
 import envoy
-import production_meter
-import consumption_meter
 import import_export_meter
+import daily_offset_meter
 import signal
 import sys
 import time
+import datetime
 from neopixel import *
 
 LED_COUNT      = 32      # Number of LED pixels.
@@ -36,6 +36,12 @@ class IQEnvoyLed():
             iq_envoy = self.iq_envoy,
             pixel_count = LED_COUNT
         )
+        self.doffset_meter = daily_offset_meter.DailyOffsetMeter(
+            iq_envoy = self.iq_envoy,
+            pixel_count = LED_COUNT
+        )
+
+
         self.run = False
     def start(self):
         self.run = True
@@ -55,7 +61,12 @@ class IQEnvoyLed():
             self.strip.setPixelColor(i, Color(rgb[1],rgb[0], rgb[2],rgb[3]))
         self.strip.show()
     def pixel_source(self):
-        return self.exim_meter
+        seconds = datetime.datetime.now().second
+        if (seconds % 20) < 10:
+            return self.exim_meter
+        else:
+            return self.doffset_meter
+
 
 
 if __name__ == '__main__':
